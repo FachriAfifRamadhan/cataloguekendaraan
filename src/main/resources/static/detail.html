@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Data Kendaraan</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h4>Update Data Kendaraan</h4>
+            </div>
+            <div class="card-body">
+                <form id="updateForm">
+                    <input type="hidden" id="id"> 
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="nomorRegistrasiKendaraan">No. Registrasi Kendaraan</label>
+                            <input type="text" class="form-control" id="nomorRegistrasiKendaraan" placeholder="No. Registrasi Kendaraan">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="tahunPembuatan">Tahun Pembuatan</label>
+                            <input type="text" class="form-control" id="tahunPembuatan" placeholder="Tahun Pembuatan">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="namaPemilik">Nama Pemilik</label>
+                            <input type="text" class="form-control" id="namaPemilik" placeholder="Nama Pemilik">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="kapasitasSilinder">Kapasitas Silinder</label>
+                            <input type="text" class="form-control" id="kapasitasSilinder" placeholder="Kapasitas Silinder">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="merkKendaraan">Merk Kendaraan</label>
+                            <input type="text" class="form-control" id="merkKendaraan" placeholder="Merk Kendaraan">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="warnaKendaraan">Warna Kendaraan</label>
+                            <input type="text" class="form-control" id="warnaKendaraan" placeholder="Warna Kendaraan">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="alamatPemilik">Alamat Pemilik Kendaraan</label>
+                            <textarea class="form-control" id="alamatPemilik" rows="3"></textarea>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="bahanBakar">Bahan Bakar</label>
+                            <input type="text" class="form-control" id="bahanBakar" placeholder="Bahan Bakar">
+                        </div>
+                    </div>
+                    <button type="button" onclick="updateData()" class="btn btn-primary">Simpan</button>
+                    <a href="index.html" class="btn btn-secondary">Kembali</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const id = localStorage.getItem('id');
+            if (id) {
+                console.log('Retrieved ID:', id);
+                document.getElementById('id').value = id;
+                fetch(`http://localhost:8082/datakendaraan/get/${id}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Data fetched successfully:', data);
+
+                        document.getElementById('nomorRegistrasiKendaraan').value = data.data.nomorRegistrasiKendaraan;
+                        document.getElementById('tahunPembuatan').value = data.data.tahunPembuatan;
+                        document.getElementById('namaPemilik').value = data.data.namaPemilik;
+                        document.getElementById('kapasitasSilinder').value = data.data.kapasitasSilinder;
+                        document.getElementById('merkKendaraan').value = data.data.merkKendaraan;
+                        document.getElementById('warnaKendaraan').value = data.data.warnaKendaraan;
+                        document.getElementById('alamatPemilik').value = data.data.alamat;
+                        document.getElementById('bahanBakar').value = data.data.bahanBakar;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                    });
+            } else {
+                console.log('No ID found in localStorage');
+            }
+        });
+
+        function updateData() {
+            const id = document.getElementById('id').value;
+            const updatedData = {
+                nomorRegistrasiKendaraan: document.getElementById('nomorRegistrasiKendaraan').value,
+                tahunPembuatan: document.getElementById('tahunPembuatan').value,
+                namaPemilik: document.getElementById('namaPemilik').value,
+                kapasitasSilinder: document.getElementById('kapasitasSilinder').value,
+                merkKendaraan: document.getElementById('merkKendaraan').value,
+                warnaKendaraan: document.getElementById('warnaKendaraan').value,
+                alamatPemilik: document.getElementById('alamatPemilik').value,
+                bahanBakar: document.getElementById('bahanBakar').value
+            };
+
+            fetch(`http://localhost:8082/datakendaraan/update/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to update data');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Data updated successfully:', data);
+            })
+            .catch(error => {
+                console.error('Error updating data:', error);
+            });
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

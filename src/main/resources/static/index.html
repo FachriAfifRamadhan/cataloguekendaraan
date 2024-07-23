@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Data Kendaraan</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+        .form-section {
+            background-color: #ffaa66;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .table td, .table th {
+            vertical-align: middle;
+        }
+        .text-detail{
+            color: darkgoldenrod;
+            font-weight: bold;
+
+        }
+        .text-edit{
+            color: blue;
+            font-weight: bold;
+
+        }
+        .text-delete{
+            color: red;
+            font-weight: bold;
+        }
+        .form-row .form-group {
+            margin-bottom: 0; /* Remove default margin for better alignment */
+        }
+        .form-row-button{
+            display: flex;
+            justify-content:flex-start;
+            margin: 1%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="mb-4">Aplikasi Data Kendaraan</h2>
+        <div class="form-section">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="noReg">No Registrasi</label>
+                    <input type="text" class="form-control" id="noReg" placeholder="No Registrasi">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="namaPemilik">Nama Pemilik</label>
+                    <input type="text" class="form-control" id="namaPemilik" placeholder="Nama Pemilik">
+                </div>
+            </div>
+        </div>
+        <div class="form-row-button">
+            <div class="col-md-6">
+                <button type="button" class="btn btn-primary" onclick="searchData()">Search</button>
+                <a href="add.html" class="btn btn-secondary">Add</a>
+            </div>
+        </div>
+        <!-- Table to display data -->
+        <table id="dataTable" class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>No</th>
+                    <th>No Registrasi</th>
+                    <th>Nama Pemilik</th>
+                    <th>Merk Kendaraan</th>
+                    <th>Tahun Pembuatan</th>
+                    <th>Kapasitas</th>
+                    <th>Warna</th>
+                    <th>Bahan Bakar</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function fetchData() {
+            fetch('http://localhost:8082/datakendaraan/get')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(responseData => {
+                if (responseData && responseData.data && Array.isArray(responseData.data)) {
+                    let data = responseData.data;
+                    document.getElementById('tableBody').innerHTML = '';
+
+ 
+                    data.forEach((item, index) => {
+                        let row = `<tr>
+                            <td>${index + 1}</td>
+                            <td>${item.nomorRegistrasiKendaraan}</td>
+                            <td>${item.namaPemilik}</td>
+                            <td>${item.merkKendaraan}</td>
+                            <td>${item.tahunPembuatan}</td>
+                            <td>${item.kapasitasSilinder}</td>
+                            <td>${item.warnaKendaraan}</td>
+                            <td>${item.bahanBakar}</td>
+                            <td>
+                                <a onclick="saveID(${item.id})" href="detail.html" class="text-detail">Detail</a>
+                                <a onclick="saveID(${item.id})" href="Update.html" class="text-edit">Edit</a>
+                                <a onclick="deleteData(${item.id})" class="text-delete">Delete</a>
+                            </td>
+                        </tr>`;
+                        document.getElementById('tableBody').innerHTML += row;
+                    });
+                } else {
+                    console.error('Data array not found in response');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        }
+
+        function searchData() {
+            const noReg = document.getElementById('noReg').value.trim();
+            const namaPemilik = document.getElementById('namaPemilik').value.trim();
+
+            const requestData = {
+                nomorRegistrasiKendaraan: noReg,
+                namaPemilik: namaPemilik
+            };
+
+            fetch('http://localhost:8082/datakendaraan/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(responseData => {
+                if (responseData && responseData.data && Array.isArray(responseData.data)) {
+                    let data = responseData.data;
+                    console.log(data);
+                    let tableBody = document.getElementById('tableBody');
+                    tableBody.innerHTML = '';
+
+                    data.forEach((item, index) => {
+                        let row = `<tr>
+                            <td>${index + 1}</td>
+                            <td>${item.nomorRegistrasiKendaraan}</td>
+                            <td>${item.namaPemilik}</td>
+                            <td>${item.merkKendaraan}</td>
+                            <td>${item.tahunPembuatan}</td>
+                            <td>${item.kapasitasSilinder}</td>
+                            <td>${item.warnaKendaraan}</td>
+                            <td>${item.bahanBakar}</td>
+                            <td>
+                                <a onclick="saveID(${item.id})" href="detail.html" class="text detail">Detail</a>
+                                <a onclick="saveID(${item.id})" href="Update.html" class="text edit">Edit</a>
+                                <a onclick="deleteData(${item.id})" class="text delete">Delete</a>
+                            </td>
+                        </tr>`;
+                        tableBody.innerHTML += row;
+                    });
+                } else {
+                    console.error('Data array not found in response');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        }
+
+
+        function saveID(id) {
+            localStorage.setItem('id', id);
+            console.log(localStorage.getItem('id'));
+        }
+
+        function deleteData(id) {
+            fetch(`http://localhost:8082/datakendaraan/delete/${id}`, {
+                method: 'DELETE',
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete data');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Data deleted successfully:', data);
+                fetchData(); 
+            })
+            .catch(error => {
+                console.error('Error deleting data:', error);
+            });
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchData();
+        });
+    </script>
+</body>
+</html>

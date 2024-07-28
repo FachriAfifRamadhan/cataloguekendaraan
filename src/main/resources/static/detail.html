@@ -95,39 +95,6 @@
             }
         });
 
-        function updateData() {
-            const id = document.getElementById('id').value;
-            const updatedData = {
-                nomorRegistrasiKendaraan: document.getElementById('nomorRegistrasiKendaraan').value,
-                tahunPembuatan: document.getElementById('tahunPembuatan').value,
-                namaPemilik: document.getElementById('namaPemilik').value,
-                kapasitasSilinder: document.getElementById('kapasitasSilinder').value,
-                merkKendaraan: document.getElementById('merkKendaraan').value,
-                warnaKendaraan: document.getElementById('warnaKendaraan').value,
-                alamatPemilik: document.getElementById('alamatPemilik').value,
-                bahanBakar: document.getElementById('bahanBakar').value
-            };
-
-            fetch(`http://localhost:8082/datakendaraan/update/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(updatedData)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to update data');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Data updated successfully:', data);
-            })
-            .catch(error => {
-                console.error('Error updating data:', error);
-            });
-        }
     </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
